@@ -56,6 +56,14 @@ class BatchTooLarge(ContractError):
     default_detail = "El lote supera el máximo de eventos."
 
 
+class ConcurrencyConflict(ContractError):
+    """La sesión cambió durante varias escrituras seguidas. El cliente reintenta, como ante cualquier 5xx."""
+
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    default_code = "server_error"
+    default_detail = "La sesión está recibiendo otras solicitudes. Reintentar."
+
+
 # Errores propios de DRF, traducidos a códigos del contrato
 _DRF_CODES = [
     ((exceptions.AuthenticationFailed, exceptions.NotAuthenticated), "invalid_api_key", "Clave ausente o incorrecta."),

@@ -173,3 +173,7 @@ CORS_URLS_REGEX = r"^/(v1|stats)/.*$"
 CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS")
 CORS_ALLOW_HEADERS = ["content-type", "x-api-key"]
 CORS_ALLOW_METHODS = ["GET", "POST", "OPTIONS"]
+
+if DEBUG:
+    # En desarrollo, cualquier puerto local (por ejemplo, el servidor de Build and Run de Unity)
+    CORS_ALLOWED_ORIGIN_REGEXES = [r"^http://(localhost|127\.0\.0\.1)(:\d+)?$"]

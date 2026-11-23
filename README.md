@@ -8,14 +8,14 @@ La primera simulación que lo usa es el [Taller de Ensamblado](https://github.co
 
 ## Estado
 
-🚧 En diseño.
+🚧 En desarrollo.
 
 - [x] Decisiones de arquitectura y modelo de datos.
-- [ ] Endpoints del contrato (`/v1`).
-- [ ] Admin: simulaciones y claves de API.
+- [x] Endpoints del contrato (`/v1`), con sus tests.
+- [x] Admin: simulaciones y claves de API.
 - [ ] Analizador del Taller de Ensamblado: contexto y resumen de cada sesión.
+- [ ] Cierre de sesiones por inactividad.
 - [ ] Endpoints de métricas para el tablero.
-- [ ] Tests del contrato.
 - [ ] Despliegue en Render y MongoDB Atlas.
 
 ## Stack
@@ -66,6 +66,12 @@ docker compose -f docker-compose-dev.yml exec api python manage.py createsuperus
 La API queda en `http://127.0.0.1:8000` y el admin en `http://127.0.0.1:8000/admin/`.
 
 **Editor.** Para que VS Code reconozca las bibliotecas, con los contenedores en marcha: extensión **Dev Containers** → **Attach to Running Container** → `bitacora-api-api-1`, y abrir la carpeta `/app`. VS Code usa el Python del contenedor.
+
+**Tests.** Usan una base de prueba aparte, que Django crea y borra:
+
+```bash
+docker compose -f docker-compose-dev.yml exec api python manage.py test telemetry
+```
 
 **Dependencias.** Para agregar una, sumarla a `requirements.txt` y reconstruir la imagen con `--build`.
 
