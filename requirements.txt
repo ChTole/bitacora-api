@@ -1,0 +1,9 @@
+# Django 5.2 LTS: soporte de seguridad hasta abril de 2028
+Django>=5.2,<5.3
+
+# Su versión major.minor tiene que coincidir con la de Django
+django-mongodb-backend>=5.2,<5.3
+pymongo>=4.7,<5
+
+djangorestframework>=3.16,<4
+django-cors-headers>=4.7,<5

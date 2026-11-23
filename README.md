@@ -49,7 +49,25 @@ Equipo                        ──► /admin/        Simulaciones y claves
 
 ## Puesta en marcha
 
-Pendiente: se completa con el primer código.
+Solo se necesita **Docker**. Python y MongoDB corren en contenedores: no hace falta instalarlos ni crear un entorno virtual.
+
+```bash
+cp .env.example .env
+docker compose -f docker-compose-dev.yml up --build
+```
+
+En otra terminal, la primera vez:
+
+```bash
+docker compose -f docker-compose-dev.yml exec api python manage.py migrate
+docker compose -f docker-compose-dev.yml exec api python manage.py createsuperuser
+```
+
+La API queda en `http://127.0.0.1:8000` y el admin en `http://127.0.0.1:8000/admin/`.
+
+**Editor.** Para que VS Code reconozca las bibliotecas, con los contenedores en marcha: extensión **Dev Containers** → **Attach to Running Container** → `bitacora-api-api-1`, y abrir la carpeta `/app`. VS Code usa el Python del contenedor.
+
+**Dependencias.** Para agregar una, sumarla a `requirements.txt` y reconstruir la imagen con `--build`.
 
 ## Variables de entorno
 

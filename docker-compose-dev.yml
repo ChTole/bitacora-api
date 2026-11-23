@@ -1,0 +1,32 @@
+# Entorno de desarrollo: MongoDB (replica set de un nodo) y la API.
+# Uso: docker compose -f docker-compose-dev.yml up
+
+name: bitacora-api
+
+services:
+  mongodb:
+    image: mongodb/mongodb-atlas-local:8.0
+    hostname: mongodb
+    ports:
+      - "127.0.0.1:27017:27017"   # solo accesible desde esta computadora
+    volumes:
+      - db:/data/db
+      - configdb:/data/configdb
+      - mongot:/data/mongot
+
+  api:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file: .env
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - .:/app                    # el código se edita en el repo y se refleja en el contenedor
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+volumes:
+  db:
+  configdb:
+  mongot:
