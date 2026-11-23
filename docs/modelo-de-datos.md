@@ -50,6 +50,8 @@ Una sesión, con sus eventos y su resumen.
   "status": "completed",
   "started_at": ISODate("2026-11-23T15:05:00.000Z"),
   "finished_at": ISODate("2026-11-23T15:12:40.000Z"),
+  "closed_by": "client",
+  "last_activity_at": ISODate("2026-11-23T15:12:40.000Z"),
   "event_count": 42,
   "discarded_count": 0,
   "context": { "furniture_id": "taburete" },
@@ -75,6 +77,8 @@ Una sesión, con sus eventos y su resumen.
 | `participant` | `null` o `{ type, value }`, como en el contrato. |
 | `status` | `active`, `completed` o `abandoned`. |
 | `started_at`, `finished_at` | Creación y cierre, según el reloj del servidor. `finished_at` es `null` mientras la sesión está activa. |
+| `closed_by` | `client` si la cerró Bitácora, `server` si se cerró por inactividad. `null` mientras está activa. |
+| `last_activity_at` | Última solicitud recibida para la sesión: creación, lote de eventos o cierre. |
 | `event_count` | Cantidad de eventos guardados. Se usa para el control de concurrencia y para el límite. |
 | `discarded_count` | Eventos descartados por haber alcanzado el límite. |
 | `context` | Datos de la sesión que el tablero usa para filtrar y agrupar. Los define el analizador de cada simulación. |
@@ -104,6 +108,7 @@ Si una simulación no tiene analizador, sus sesiones se guardan igual, con `cont
 | `simulation_id`, `status`, `started_at` (descendente) | Tasa de finalización, sesiones activas |
 | `simulation_id`, `alias`, `started_at` (descendente) | Búsqueda de resultados por alias; alias recientes |
 | `simulation_id`, `context.furniture_id`, `started_at` (descendente) | Métricas por mueble del Taller |
+| `status`, `last_activity_at` | Búsqueda de sesiones inactivas para cerrarlas |
 
 Los índices sobre `context` se agregan por simulación, según lo que use su tablero.
 
@@ -115,7 +120,7 @@ La colección tiene un validador `$jsonSchema` que refuerza las reglas de la apl
 {
   "$jsonSchema": {
     "bsonType": "object",
-    "required": ["session_id", "simulation_id", "alias", "status", "started_at", "event_count", "events"],
+    "required": ["session_id", "simulation_id", "alias", "status", "started_at", "last_activity_at", "event_count", "events"],
     "properties": {
       "session_id": { "bsonType": "string" },
       "simulation_id": { "bsonType": "string" },
@@ -123,6 +128,8 @@ La colección tiene un validador `$jsonSchema` que refuerza las reglas de la apl
       "status": { "enum": ["active", "completed", "abandoned"] },
       "started_at": { "bsonType": "date" },
       "finished_at": { "bsonType": ["date", "null"] },
+      "closed_by": { "enum": ["client", "server", null] },
+      "last_activity_at": { "bsonType": "date" },
       "event_count": { "bsonType": "int", "minimum": 0, "maximum": 2000 },
       "discarded_count": { "bsonType": "int", "minimum": 0 },
       "context": { "bsonType": "object" },
@@ -166,6 +173,7 @@ result = sessions.update_one(
     {
         "$push": {"events": {"$each": nuevos, "$sort": {"sequence": 1}}},
         "$inc": {"event_count": len(nuevos), "discarded_count": discarded},
+        "$set": {"last_activity_at": ahora},
     },
 )
 ```
@@ -183,7 +191,13 @@ Este paso se implementa con PyMongo y no con el ORM, porque `save()` reescribe l
 1. Leer la sesión completa.
    - Si ya está cerrada → `200` con los datos del primer cierre.
 2. Calcular `summary` con el analizador de la simulación, si tiene uno.
-3. Guardar `status`, `finished_at`, `summary` y `summary_version` con el mismo filtro condicional por `status: "active"` y `event_count`. Si un lote llegó entre la lectura y la escritura, se vuelve al paso 1, para que el resumen incluya todos los eventos.
+3. Guardar `status`, `finished_at`, `closed_by: "client"`, `summary` y `summary_version` con el mismo filtro condicional por `status: "active"` y `event_count`. Si un lote llegó entre la lectura y la escritura, se vuelve al paso 1, para que el resumen incluya todos los eventos.
+
+## Cierre por inactividad
+
+Si se cierra la pestaña del navegador, Bitácora no llega a cerrar la sesión. El servidor cierra como `abandoned` las sesiones activas con `last_activity_at` de hace más de 2 horas, con `closed_by: "server"` y el resumen calculado solo desde los eventos.
+
+El plan gratuito de Render no tiene tareas programadas, así que el cierre se ejecuta antes de responder una consulta de métricas: se buscan las sesiones inactivas con el índice `status`, `last_activity_at` y se cierran con el mismo procedimiento que un cierre normal. Si no hay ninguna, la búsqueda por índice no tiene un costo apreciable.
 
 ## Alias
 
