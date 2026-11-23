@@ -63,6 +63,8 @@ INSTALLED_APPS = [
     # Terceros
     "rest_framework",
     "corsheaders",
+    # Propias
+    "telemetry",
 ]
 
 MIDDLEWARE = [
@@ -159,6 +161,8 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser"],
     "UNAUTHENTICATED_USER": None,
+    # Errores con el formato del contrato: { "error": { "code", "message" } }
+    "EXCEPTION_HANDLER": "telemetry.exceptions.contract_exception_handler",
 }
 
 
