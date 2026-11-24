@@ -20,4 +20,5 @@ from django.urls import include, path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("v1/", include("telemetry.urls")),   # Contrato de Bitácora
+    path("stats/v1/", include("stats.urls")),  # API del tablero
 ]

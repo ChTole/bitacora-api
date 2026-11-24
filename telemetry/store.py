@@ -74,7 +74,7 @@ def add_events(simulation_id, session_id, events):
     query = {"session_id": session_id, "simulation_id": simulation_id}
 
     for _ in range(MAX_WRITE_ATTEMPTS):
-        current = sessions.find_one(query, {"status": 1, "event_count": 1, "events.sequence": 1})
+        current = sessions.find_one(query, {"status": 1, "event_count": 1, "events.sequence": 1, "context": 1})
         if current is None:
             raise SessionNotFound()
         if current["status"] != Session.Status.ACTIVE:
@@ -115,12 +115,17 @@ def add_events(simulation_id, session_id, events):
             for event in to_store
         ]
 
+        changes = {"last_activity_at": now}
+        context = _early_context(simulation_id, current, documents)
+        if context:
+            changes["context"] = context
+
         result = sessions.update_one(
             {**query, "status": Session.Status.ACTIVE, "event_count": count},
             {
                 "$push": {"events": {"$each": documents, "$sort": {"sequence": 1}}},
                 "$inc": {"event_count": len(documents), "discarded_count": discarded},
-                "$set": {"last_activity_at": now},
+                "$set": changes,
             },
         )
         if result.matched_count == 1:
@@ -128,6 +133,17 @@ def add_events(simulation_id, session_id, events):
         # Otra solicitud modificó la sesión entre la lectura y la escritura: se vuelve a leer
 
     raise ConcurrencyConflict()
+
+
+def _early_context(simulation_id, session, new_events):
+    """
+    Contexto de una sesión activa, a partir del primer lote que lo trae. Así, los filtros del tablero
+    (por ejemplo, por mueble) incluyen las sesiones en curso. Al cerrar, se recalcula con todos los eventos.
+    """
+    if session.get("context"):
+        return None
+    analyzer = get_analyzer(simulation_id)
+    return analyzer.context(new_events) if analyzer is not None else None
 
 
 # ───────────── Cerrar ─────────────

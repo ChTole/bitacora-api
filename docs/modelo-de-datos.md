@@ -81,7 +81,7 @@ Una sesión, con sus eventos y su resumen.
 | `last_activity_at` | Última solicitud recibida para la sesión: creación, lote de eventos o cierre. |
 | `event_count` | Cantidad de eventos guardados. Se usa para el control de concurrencia y para el límite. |
 | `discarded_count` | Eventos descartados por haber alcanzado el límite. |
-| `context` | Datos de la sesión que el tablero usa para filtrar y agrupar. Los define el analizador de cada simulación. |
+| `context` | Datos de la sesión que el tablero usa para filtrar y agrupar. Los define el analizador de cada simulación. Se guarda con el primer lote que los trae, para que las sesiones en curso también se puedan filtrar, y se recalcula al cerrar. |
 | `summary` | Métricas de la sesión. Se calcula al cerrarla; `null` mientras está activa. Lo define el analizador de cada simulación. |
 | `summary_version` | Versión del cálculo del resumen. Si el cálculo cambia, permite identificar y recalcular las sesiones con una versión anterior. |
 | `events` | Eventos ordenados por `sequence`. Hasta 2000. |

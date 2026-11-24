@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "corsheaders",
     # Propias
     "telemetry",
+    "stats",
 ]
 
 MIDDLEWARE = [
@@ -163,6 +164,10 @@ REST_FRAMEWORK = {
     "UNAUTHENTICATED_USER": None,
     # Errores con el formato del contrato: { "error": { "code", "message" } }
     "EXCEPTION_HANDLER": "telemetry.exceptions.contract_exception_handler",
+    # Límite de solicitudes por IP de la API del tablero (respuesta 429 rate_limited)
+    "DEFAULT_THROTTLE_RATES": {
+        "stats": env("STATS_RATE_LIMIT", "120/min"),
+    },
 }
 
 
