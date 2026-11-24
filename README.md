@@ -80,6 +80,13 @@ La API queda en `http://127.0.0.1:8000` y el admin en `http://127.0.0.1:8000/adm
 docker compose -f docker-compose-dev.yml exec api python manage.py test telemetry stats
 ```
 
+**Datos de ejemplo.** Para probar el tablero sin resolver la simulación muchas veces, el comando `seed_sessions` genera sesiones del Taller con eventos inventados y su resumen calculado por el analizador. Solo funciona con `DEBUG=True`, y las sesiones quedan marcadas para borrarlas después:
+
+```bash
+docker compose -f docker-compose-dev.yml exec api python manage.py seed_sessions --count 150
+docker compose -f docker-compose-dev.yml exec api python manage.py seed_sessions --clear
+```
+
 **Dependencias.** Para agregar una, sumarla a `requirements.txt` y reconstruir la imagen con `--build`.
 
 **Versiones.** Los cambios de cada versión están en el [historial de cambios](CHANGELOG.md).

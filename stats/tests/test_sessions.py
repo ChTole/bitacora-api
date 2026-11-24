@@ -37,6 +37,12 @@ class TimelineTests(StatsTestCase):
         body = self.get("/timeline", tz="America/Argentina/Buenos_Aires")
         self.assertEqual([day["date"] for day in body["days"]], ["2026-11-20"])
 
+    def test_accepts_legacy_time_zone_names(self):
+        # Chrome informa la zona de Argentina con su nombre antiguo, America/Buenos_Aires
+        self.add()
+        body = self.get("/timeline", tz="America/Buenos_Aires")
+        self.assertEqual(body["tz"], "America/Buenos_Aires")
+
     def test_invalid_time_zone(self):
         response = self.client.get(BASE + "/timeline", {"tz": "Marte/Base"})
         self.assertEqual(response.status_code, 400)

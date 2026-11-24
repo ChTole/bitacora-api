@@ -6,6 +6,10 @@ django-mongodb-backend>=5.2,<5.3
 pymongo>=4.7,<5
 
 djangorestframework>=3.16,<4
+
+# Zonas horarias con sus nombres antiguos (por ejemplo, America/Buenos_Aires, que usa Chrome).
+# La imagen de Debian ya no los incluye en su paquete tzdata.
+tzdata>=2026.1
 django-cors-headers>=4.7,<5
 
 # Producción: servidor de aplicaciones y archivos estáticos del admin
