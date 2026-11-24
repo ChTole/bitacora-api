@@ -107,45 +107,140 @@ Si una simulación no tiene analizador, sus sesiones se guardan igual, con `cont
 | `simulation_id`, `started_at` (descendente) | Listados y métricas por período |
 | `simulation_id`, `status`, `started_at` (descendente) | Tasa de finalización, sesiones activas |
 | `simulation_id`, `alias`, `started_at` (descendente) | Búsqueda de resultados por alias; alias recientes |
-| `simulation_id`, `context.furniture_id`, `started_at` (descendente) | Métricas por mueble del Taller |
+| `context.furniture_id`, `started_at` (descendente), parcial: solo `simulation_id: "taller-ensamblado"` | Métricas por mueble del Taller |
 | `status`, `last_activity_at` | Búsqueda de sesiones inactivas para cerrarlas |
 
-Los índices sobre `context` se agregan por simulación, según lo que use su tablero.
+Los índices sobre `context` se agregan por simulación, según lo que use su tablero. Son parciales: solo incluyen las sesiones de esa simulación, que son las que tienen esos campos.
+
+Todos, menos el del Taller, se definen en el modelo `Session`. El del Taller se crea en la migración `0002`, con PyMongo, porque Django no puede indexar un campo dentro de un `JSONField`.
 
 ### Validación
 
-La colección tiene un validador `$jsonSchema` que refuerza las reglas de la aplicación:
+La colección tiene un validador `$jsonSchema`, que se aplica en la migración `0002` y refuerza las reglas de la aplicación. Los enteros admiten `int` y `long`, los dos tipos con los que PyMongo guarda un entero de Python según su tamaño.
 
 ```json
 {
   "$jsonSchema": {
     "bsonType": "object",
-    "required": ["session_id", "simulation_id", "alias", "status", "started_at", "last_activity_at", "event_count", "events"],
+    "required": [
+      "session_id",
+      "simulation_id",
+      "alias",
+      "status",
+      "started_at",
+      "last_activity_at",
+      "event_count",
+      "discarded_count",
+      "events"
+    ],
     "properties": {
-      "session_id": { "bsonType": "string" },
-      "simulation_id": { "bsonType": "string" },
-      "alias": { "bsonType": "string" },
-      "status": { "enum": ["active", "completed", "abandoned"] },
-      "started_at": { "bsonType": "date" },
-      "finished_at": { "bsonType": ["date", "null"] },
-      "closed_by": { "enum": ["client", "server", null] },
-      "last_activity_at": { "bsonType": "date" },
-      "event_count": { "bsonType": "int", "minimum": 0, "maximum": 2000 },
-      "discarded_count": { "bsonType": "int", "minimum": 0 },
-      "context": { "bsonType": "object" },
-      "summary": { "bsonType": ["object", "null"] },
+      "session_id": {
+        "bsonType": "string"
+      },
+      "simulation_id": {
+        "bsonType": "string"
+      },
+      "alias": {
+        "bsonType": "string"
+      },
+      "participant": {
+        "bsonType": [
+          "object",
+          "null"
+        ]
+      },
+      "status": {
+        "enum": [
+          "active",
+          "completed",
+          "abandoned"
+        ]
+      },
+      "started_at": {
+        "bsonType": "date"
+      },
+      "finished_at": {
+        "bsonType": [
+          "date",
+          "null"
+        ]
+      },
+      "closed_by": {
+        "enum": [
+          "client",
+          "server",
+          null
+        ]
+      },
+      "last_activity_at": {
+        "bsonType": "date"
+      },
+      "event_count": {
+        "bsonType": [
+          "int",
+          "long"
+        ],
+        "minimum": 0,
+        "maximum": 2000
+      },
+      "discarded_count": {
+        "bsonType": [
+          "int",
+          "long"
+        ],
+        "minimum": 0
+      },
+      "context": {
+        "bsonType": "object"
+      },
+      "summary": {
+        "bsonType": [
+          "object",
+          "null"
+        ]
+      },
+      "summary_version": {
+        "bsonType": [
+          "int",
+          "long",
+          "null"
+        ]
+      },
       "events": {
         "bsonType": "array",
         "maxItems": 2000,
         "items": {
           "bsonType": "object",
-          "required": ["sequence", "timestamp", "received_at", "type"],
+          "required": [
+            "sequence",
+            "timestamp",
+            "received_at",
+            "type"
+          ],
           "properties": {
-            "sequence": { "bsonType": ["int", "long"], "minimum": 1 },
-            "timestamp": { "bsonType": "date" },
-            "received_at": { "bsonType": "date" },
-            "type": { "bsonType": "string", "maxLength": 64 },
-            "data": { "bsonType": ["object", "null"] }
+            "sequence": {
+              "bsonType": [
+                "int",
+                "long"
+              ],
+              "minimum": 1
+            },
+            "timestamp": {
+              "bsonType": "date"
+            },
+            "received_at": {
+              "bsonType": "date"
+            },
+            "type": {
+              "bsonType": "string",
+              "maxLength": 64
+            },
+            "data": {
+              "bsonType": [
+                "object",
+                "null"
+              ]
+            }
           }
         }
       }

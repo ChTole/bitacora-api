@@ -15,6 +15,7 @@ La primera simulación que lo usa es el [Taller de Ensamblado](https://github.co
 - [x] Admin: simulaciones y claves de API.
 - [x] Analizador del Taller de Ensamblado: contexto y resumen de cada sesión.
 - [x] Cierre de sesiones por inactividad.
+- [x] Validación del esquema de las sesiones e índice por mueble.
 - [ ] Endpoints de métricas para el tablero.
 - [ ] Despliegue en Render y MongoDB Atlas.
 
