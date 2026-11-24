@@ -41,6 +41,7 @@ Equipo                        ──► /admin/        Simulaciones y claves
 | Documento | Contenido |
 |---|---|
 | [Modelo de datos](docs/modelo-de-datos.md) | Colecciones, documentos, índices, validación y registro de eventos |
+| [API del tablero](docs/api-tablero.md) | Endpoints de solo lectura que consume el tablero (`/stats/v1`) |
 | [Métricas del Taller](docs/metricas.md) | Contexto y resumen de cada sesión, y métricas para el tablero |
 | [001 · Stack](docs/decisiones/001-stack.md) | Django, DRF y Django MongoDB Backend |
 | [002 · Solo MongoDB](docs/decisiones/002-solo-mongodb.md) | Una única base de datos, sin parte relacional |

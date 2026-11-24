@@ -113,7 +113,7 @@ Todas las cantidades coinciden: `consistent: true`. La demora máxima de entrega
 
 ## Métricas entre sesiones
 
-Propuesta para el tablero. Los endpoints se van a definir en `docs/api-tablero.md`. Todas se pueden filtrar por mueble, versión de la simulación, escritorio o móvil y período.
+Propuesta para el tablero. Los endpoints están en [api-tablero.md](api-tablero.md). Todas se pueden filtrar por mueble, versión de la simulación, escritorio o móvil y período.
 
 | Métrica | Cálculo | Fuente |
 |---|---|---|
