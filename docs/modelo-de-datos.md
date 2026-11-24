@@ -195,9 +195,20 @@ Este paso se implementa con PyMongo y no con el ORM, porque `save()` reescribe l
 
 ## Cierre por inactividad
 
-Si se cierra la pestaña del navegador, Bitácora no llega a cerrar la sesión. El servidor cierra como `abandoned` las sesiones activas con `last_activity_at` de hace más de 2 horas, con `closed_by: "server"` y el resumen calculado solo desde los eventos.
+Si se cierra la pestaña del navegador, Bitácora no llega a cerrar la sesión. El servidor cierra como `abandoned` las sesiones activas con `last_activity_at` de hace más de 2 horas, con `closed_by: "server"` y el resumen calculado con los eventos que llegaron.
 
-El plan gratuito de Render no tiene tareas programadas, así que el cierre se ejecuta antes de responder una consulta de métricas: se buscan las sesiones inactivas con el índice `status`, `last_activity_at` y se cierran con el mismo procedimiento que un cierre normal. Si no hay ninguna, la búsqueda por índice no tiene un costo apreciable.
+- **`finished_at` es la última actividad**, no el momento en que se detectó la inactividad: es cuando la sesión terminó en realidad.
+- **Se usa el mismo filtro condicional que en un cierre normal**, más la condición de inactividad. Si llega un lote entre la lectura y la escritura, la sesión vuelve a estar activa y no se cierra.
+- **Si Bitácora pide el cierre después**, recibe `200` con los datos del cierre del servidor, como en cualquier sesión ya cerrada.
+
+El plan gratuito de Render no tiene tareas programadas, así que el cierre se ejecuta antes de responder una consulta de métricas: se buscan las sesiones inactivas con el índice `status`, `last_activity_at` y se cierran hasta 100 por consulta. Si no hay ninguna, la búsqueda por índice no tiene un costo apreciable.
+
+También se puede ejecutar a mano:
+
+```bash
+python manage.py close_inactive_sessions            # cierra las inactivas por más de 2 horas
+python manage.py close_inactive_sessions --dry-run  # solo muestra cuántas hay
+```
 
 ## Alias
 

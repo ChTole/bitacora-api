@@ -7,7 +7,7 @@ Los documentos tienen la misma forma que el modelo Session, así que el ORM y el
 """
 
 from dataclasses import dataclass
-from datetime import timezone
+from datetime import timedelta, timezone
 
 from bson.codec_options import CodecOptions
 from django.db import connection
@@ -132,8 +132,8 @@ def add_events(simulation_id, session_id, events):
 
 # ───────────── Cerrar ─────────────
 
-def finish_session(simulation_id, session_id, status, closed_by=Session.ClosedBy.CLIENT):
-    """Cierra la sesión y calcula su resumen. Si ya estaba cerrada, devuelve los datos del primer cierre."""
+def finish_session(simulation_id, session_id, status):
+    """Cierre pedido por Bitácora. Si la sesión ya estaba cerrada, devuelve los datos del primer cierre."""
     sessions = sessions_collection()
     query = {"session_id": session_id, "simulation_id": simulation_id}
 
@@ -144,7 +144,7 @@ def finish_session(simulation_id, session_id, status, closed_by=Session.ClosedBy
         if current["status"] != Session.Status.ACTIVE:
             return current
 
-        changes = _closing_changes(current, status, closed_by)
+        changes = _closing_changes(current, status, Session.ClosedBy.CLIENT, finished_at=utc_now())
         result = sessions.update_one(
             {**query, "status": Session.Status.ACTIVE, "event_count": current["event_count"]},
             {"$set": changes},
@@ -156,14 +156,53 @@ def finish_session(simulation_id, session_id, status, closed_by=Session.ClosedBy
     raise ConcurrencyConflict()
 
 
-def _closing_changes(session, status, closed_by):
-    now = utc_now()
+# ───────────── Cerrar por inactividad ─────────────
+
+# Una sesión activa sin solicitudes durante este tiempo se considera abandonada
+INACTIVITY_TIMEOUT = timedelta(hours=2)
+
+# Sesiones que se cierran como máximo en cada llamada, para acotar la demora de una consulta
+INACTIVE_BATCH = 100
+
+
+def close_inactive_sessions(timeout=INACTIVITY_TIMEOUT, now=None, limit=INACTIVE_BATCH):
+    """
+    Cierra como abandoned, con closed_by: server, las sesiones activas sin actividad desde hace más de
+    timeout. Por ejemplo, las de una pestaña que se cerró. Devuelve la cantidad de sesiones cerradas.
+
+    finished_at es la última actividad: es cuando la sesión terminó en realidad, no cuando se detectó.
+    """
+    sessions = sessions_collection()
+    cutoff = (now or utc_now()) - timeout
+    idle = {"status": Session.Status.ACTIVE, "last_activity_at": {"$lt": cutoff}}
+
+    closed = 0
+    for candidate in sessions.find(idle, {"_id": 1}).limit(limit):
+        # Se lee completa para calcular el resumen. Si ya no está inactiva, se saltea.
+        current = sessions.find_one({"_id": candidate["_id"], **idle})
+        if current is None:
+            continue
+
+        changes = _closing_changes(current, Session.Status.ABANDONED, Session.ClosedBy.SERVER,
+                                   finished_at=current["last_activity_at"])
+        # Mismo filtro condicional que un cierre normal, más la inactividad: si llegó un lote
+        # en el medio, la sesión volvió a estar activa y no se cierra.
+        result = sessions.update_one(
+            {"_id": current["_id"], **idle, "event_count": current["event_count"]},
+            {"$set": changes},
+        )
+        closed += result.modified_count
+    return closed
+
+
+def _closing_changes(session, status, closed_by, finished_at):
     changes = {
         "status": status,
-        "finished_at": now,
+        "finished_at": finished_at,
         "closed_by": closed_by,
-        "last_activity_at": now,
     }
+    if closed_by == Session.ClosedBy.CLIENT:
+        changes["last_activity_at"] = finished_at
     analyzer = get_analyzer(session["simulation_id"])
     if analyzer is not None:
         events = session.get("events", [])

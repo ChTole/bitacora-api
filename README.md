@@ -14,7 +14,7 @@ La primera simulación que lo usa es el [Taller de Ensamblado](https://github.co
 - [x] Endpoints del contrato (`/v1`), con sus tests.
 - [x] Admin: simulaciones y claves de API.
 - [x] Analizador del Taller de Ensamblado: contexto y resumen de cada sesión.
-- [ ] Cierre de sesiones por inactividad.
+- [x] Cierre de sesiones por inactividad.
 - [ ] Endpoints de métricas para el tablero.
 - [ ] Despliegue en Render y MongoDB Atlas.
 
