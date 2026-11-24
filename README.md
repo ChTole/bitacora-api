@@ -6,9 +6,11 @@ Implementa la **versión 1.1** del [contrato de Bitácora con el servidor](https
 
 La primera simulación que lo usa es el [Taller de Ensamblado](https://github.com/ChTole/taller-ensamblado).
 
+🔗 **API:** [bitacora-api-i1b6.onrender.com](https://bitacora-api-i1b6.onrender.com/stats/v1/simulations). Corre en el plan gratuito de Render: si no recibió solicitudes en los últimos minutos, la primera respuesta puede tardar alrededor de un minuto.
+
 ## Estado
 
-🚧 En desarrollo.
+🚧 En desarrollo. La versión 0.1.0 está en producción y recibe las sesiones del Taller publicado.
 
 - [x] Decisiones de arquitectura y modelo de datos.
 - [x] Endpoints del contrato (`/v1`), con sus tests.
@@ -17,7 +19,8 @@ La primera simulación que lo usa es el [Taller de Ensamblado](https://github.co
 - [x] Cierre de sesiones por inactividad.
 - [x] Validación del esquema de las sesiones e índice por mueble.
 - [x] Endpoints de métricas para el tablero (`/stats/v1`), con sus tests.
-- [ ] Despliegue en Render y MongoDB Atlas.
+- [x] Despliegue en Render y MongoDB Atlas.
+- [ ] Tablero de métricas ([bitacora-tablero](https://github.com/ChTole/bitacora-tablero)).
 
 ## Stack
 
@@ -31,6 +34,7 @@ La primera simulación que lo usa es el [Taller de Ensamblado](https://github.co
 Simulación (Unity + Bitácora) ──► /v1/...        Contrato de Bitácora (clave de API)
 Tablero (Angular, Netlify)    ──► /stats/v1/...  Métricas, solo lectura
 Equipo                        ──► /admin/        Simulaciones y claves
+Render                        ──► /healthz       Verificación sin clave
 ```
 
 - **API REST, sin vistas propias.** Django no genera páginas: la única interfaz que se usa es el admin, como herramienta interna.
@@ -73,10 +77,12 @@ La API queda en `http://127.0.0.1:8000` y el admin en `http://127.0.0.1:8000/adm
 **Tests.** Usan una base de prueba aparte, que Django crea y borra:
 
 ```bash
-docker compose -f docker-compose-dev.yml exec api python manage.py test telemetry
+docker compose -f docker-compose-dev.yml exec api python manage.py test telemetry stats
 ```
 
 **Dependencias.** Para agregar una, sumarla a `requirements.txt` y reconstruir la imagen con `--build`.
+
+**Versiones.** Los cambios de cada versión están en el [historial de cambios](CHANGELOG.md).
 
 ## Variables de entorno
 
@@ -91,6 +97,11 @@ Ver [`.env.example`](.env.example). En desarrollo se copian a un archivo `.env`,
 | `MONGODB_URI` | Cadena de conexión a MongoDB |
 | `MONGODB_DB_NAME` | Nombre de la base de datos |
 | `CORS_ALLOWED_ORIGINS` | Dominios de las simulaciones y del tablero |
+| `CLIENT_IP_HEADER` | Encabezado con la IP real del cliente, para el límite de solicitudes. En Render, `HTTP_CF_CONNECTING_IP` |
+| `TELEMETRY_RATE_LIMIT` | Límite de solicitudes por IP del contrato. Por defecto, `600/min` |
+| `STATS_RATE_LIMIT` | Límite de solicitudes por IP del tablero. Por defecto, `120/min` |
+
+La configuración de producción está en [Despliegue](docs/despliegue.md).
 
 ## Proyectos relacionados
 
