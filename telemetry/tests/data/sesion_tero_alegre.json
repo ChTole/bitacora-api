@@ -1,0 +1,312 @@
+{
+  "session_id": "ad8cde7c-d842-4a98-86c8-62bff02946ee",
+  "alias": "Tero Alegre",
+  "simulation_id": "taller-ensamblado",
+  "participant": null,
+  "started_at": "2026-11-23T18:11:48.663Z",
+  "status": "completed",
+  "finished_at": "2026-11-23T18:14:35.611Z",
+  "events": [
+    {
+      "sequence": 1,
+      "timestamp": "2026-11-23T18:11:49.019Z",
+      "type": "assembly_started",
+      "data": {
+        "furniture_id": "living_room_table",
+        "app_version": "1.1.1",
+        "pieces": 5,
+        "joints": 4,
+        "mobile": false
+      },
+      "received_at": "2026-11-23T18:11:53.702Z"
+    },
+    {
+      "sequence": 2,
+      "timestamp": "2026-11-23T18:11:59.794Z",
+      "type": "joint_attempt_failed",
+      "data": {
+        "tenon": "TableLeg_C/TenonRef",
+        "mortise": "Table/Mortise_FL",
+        "reason": "blocked",
+        "elapsed_seconds": 10.7
+      },
+      "received_at": "2026-11-23T18:11:59.805Z"
+    },
+    {
+      "sequence": 3,
+      "timestamp": "2026-11-23T18:12:04.224Z",
+      "type": "joint_attempt_failed",
+      "data": {
+        "tenon": "TableLeg_C/TenonRef",
+        "mortise": "Table/Mortise_FR",
+        "reason": "blocked",
+        "elapsed_seconds": 15.2
+      },
+      "received_at": "2026-11-23T18:12:04.805Z"
+    },
+    {
+      "sequence": 4,
+      "timestamp": "2026-11-23T18:12:15.021Z",
+      "type": "joint_completed",
+      "data": {
+        "tenon": "TableLeg_C/TenonRef",
+        "mortise": "Table/Mortise_FR",
+        "expected": true,
+        "elapsed_seconds": 26.0,
+        "previous_failures": 1
+      },
+      "received_at": "2026-11-23T18:12:15.031Z"
+    },
+    {
+      "sequence": 5,
+      "timestamp": "2026-11-23T18:12:33.878Z",
+      "type": "joint_attempt_failed",
+      "data": {
+        "tenon": "TableLeg_D/TenonRef",
+        "mortise": "Table/Mortise_FL",
+        "reason": "position",
+        "elapsed_seconds": 44.8
+      },
+      "received_at": "2026-11-23T18:12:33.885Z"
+    },
+    {
+      "sequence": 6,
+      "timestamp": "2026-11-23T18:12:38.282Z",
+      "type": "joint_attempt_failed",
+      "data": {
+        "tenon": "TableLeg_D/TenonRef",
+        "mortise": "Table/Mortise_FL",
+        "reason": "position",
+        "elapsed_seconds": 49.2
+      },
+      "received_at": "2026-11-23T18:12:38.889Z"
+    },
+    {
+      "sequence": 7,
+      "timestamp": "2026-11-23T18:12:43.458Z",
+      "type": "help_viewed",
+      "data": {
+        "duration_seconds": 2.3,
+        "elapsed_seconds": 54.4
+      },
+      "received_at": "2026-11-23T18:12:43.891Z"
+    },
+    {
+      "sequence": 8,
+      "timestamp": "2026-11-23T18:12:46.468Z",
+      "type": "controls_viewed",
+      "data": {
+        "duration_seconds": 2.2,
+        "elapsed_seconds": 57.4
+      },
+      "received_at": "2026-11-23T18:12:48.892Z"
+    },
+    {
+      "sequence": 9,
+      "timestamp": "2026-11-23T18:13:00.693Z",
+      "type": "joint_completed",
+      "data": {
+        "tenon": "TableLeg_D/TenonRef",
+        "mortise": "Table/Mortise_BL",
+        "expected": true,
+        "elapsed_seconds": 71.6,
+        "previous_failures": 0
+      },
+      "received_at": "2026-11-23T18:13:00.701Z"
+    },
+    {
+      "sequence": 10,
+      "timestamp": "2026-11-23T18:13:17.379Z",
+      "type": "joint_attempt_failed",
+      "data": {
+        "tenon": "TableLeg_B/TenonRef",
+        "mortise": "Table/Mortise_BR",
+        "reason": "position",
+        "elapsed_seconds": 88.3
+      },
+      "received_at": "2026-11-23T18:13:17.387Z"
+    },
+    {
+      "sequence": 11,
+      "timestamp": "2026-11-23T18:13:20.763Z",
+      "type": "joint_completed",
+      "data": {
+        "tenon": "TableLeg_B/TenonRef",
+        "mortise": "Table/Mortise_BR",
+        "expected": true,
+        "elapsed_seconds": 91.7,
+        "previous_failures": 1
+      },
+      "received_at": "2026-11-23T18:13:22.387Z"
+    },
+    {
+      "sequence": 12,
+      "timestamp": "2026-11-23T18:13:24.833Z",
+      "type": "joint_undone",
+      "data": {
+        "tenon": "TableLeg_B/TenonRef",
+        "mortise": "Table/Mortise_BR",
+        "mode": "detach",
+        "piece": "TableLeg_B",
+        "elapsed_seconds": 95.8
+      },
+      "received_at": "2026-11-23T18:13:27.394Z"
+    },
+    {
+      "sequence": 13,
+      "timestamp": "2026-11-23T18:13:36.646Z",
+      "type": "joint_attempt_failed",
+      "data": {
+        "tenon": "TableLeg_A/TenonRef",
+        "mortise": "Table/Mortise_BR",
+        "reason": "position",
+        "elapsed_seconds": 107.6
+      },
+      "received_at": "2026-11-23T18:13:36.652Z"
+    },
+    {
+      "sequence": 14,
+      "timestamp": "2026-11-23T18:13:39.323Z",
+      "type": "joint_attempt_failed",
+      "data": {
+        "tenon": "TableLeg_A/TenonRef",
+        "mortise": "Table/Mortise_BR",
+        "reason": "position",
+        "elapsed_seconds": 110.3
+      },
+      "received_at": "2026-11-23T18:13:41.653Z"
+    },
+    {
+      "sequence": 15,
+      "timestamp": "2026-11-23T18:13:47.924Z",
+      "type": "joint_completed",
+      "data": {
+        "tenon": "TableLeg_A/TenonRef",
+        "mortise": "Table/Mortise_BR",
+        "expected": true,
+        "elapsed_seconds": 118.9,
+        "previous_failures": 3
+      },
+      "received_at": "2026-11-23T18:13:47.931Z"
+    },
+    {
+      "sequence": 16,
+      "timestamp": "2026-11-23T18:13:52.193Z",
+      "type": "joint_undone",
+      "data": {
+        "tenon": "TableLeg_A/TenonRef",
+        "mortise": "Table/Mortise_BR",
+        "mode": "undo",
+        "elapsed_seconds": 123.1
+      },
+      "received_at": "2026-11-23T18:13:52.940Z"
+    },
+    {
+      "sequence": 17,
+      "timestamp": "2026-11-23T18:13:53.959Z",
+      "type": "joint_completed",
+      "data": {
+        "tenon": "TableLeg_A/TenonRef",
+        "mortise": "Table/Mortise_BR",
+        "expected": true,
+        "elapsed_seconds": 124.9,
+        "previous_failures": 3
+      },
+      "received_at": "2026-11-23T18:13:57.939Z"
+    },
+    {
+      "sequence": 18,
+      "timestamp": "2026-11-23T18:14:03.008Z",
+      "type": "joint_undone",
+      "data": {
+        "tenon": "TableLeg_A/TenonRef",
+        "mortise": "Table/Mortise_BR",
+        "mode": "undo",
+        "elapsed_seconds": 134.0
+      },
+      "received_at": "2026-11-23T18:14:03.015Z"
+    },
+    {
+      "sequence": 19,
+      "timestamp": "2026-11-23T18:14:04.058Z",
+      "type": "joint_attempt_failed",
+      "data": {
+        "tenon": "TableLeg_A/TenonRef",
+        "mortise": "Table/Mortise_BR",
+        "reason": "position",
+        "elapsed_seconds": 135.0
+      },
+      "received_at": "2026-11-23T18:14:08.015Z"
+    },
+    {
+      "sequence": 20,
+      "timestamp": "2026-11-23T18:14:13.500Z",
+      "type": "joint_completed",
+      "data": {
+        "tenon": "TableLeg_A/TenonRef",
+        "mortise": "Table/Mortise_FL",
+        "expected": true,
+        "elapsed_seconds": 144.5,
+        "previous_failures": 3
+      },
+      "received_at": "2026-11-23T18:14:13.507Z"
+    },
+    {
+      "sequence": 21,
+      "timestamp": "2026-11-23T18:14:20.472Z",
+      "type": "joint_completed",
+      "data": {
+        "tenon": "TableLeg_B/TenonRef",
+        "mortise": "Table/Mortise_BR",
+        "expected": true,
+        "elapsed_seconds": 151.4,
+        "previous_failures": 4
+      },
+      "received_at": "2026-11-23T18:14:20.479Z"
+    },
+    {
+      "sequence": 22,
+      "timestamp": "2026-11-23T18:14:26.701Z",
+      "type": "help_viewed",
+      "data": {
+        "duration_seconds": 0.8,
+        "elapsed_seconds": 157.7
+      },
+      "received_at": "2026-11-23T18:14:26.702Z"
+    },
+    {
+      "sequence": 23,
+      "timestamp": "2026-11-23T18:14:34.476Z",
+      "type": "controls_viewed",
+      "data": {
+        "duration_seconds": 3.9,
+        "elapsed_seconds": 165.4
+      },
+      "received_at": "2026-11-23T18:14:34.478Z"
+    },
+    {
+      "sequence": 24,
+      "timestamp": "2026-11-23T18:14:35.315Z",
+      "type": "assembly_checked",
+      "data": {
+        "furniture_id": "living_room_table",
+        "completed": true,
+        "duration_seconds": 166.3,
+        "joints_completed": 4,
+        "joints_total": 4,
+        "incorrect_joints": 0,
+        "correct": true,
+        "failed_attempts": 8,
+        "grabs": 52,
+        "rotations": 23,
+        "undos": 2,
+        "detaches": 1,
+        "help_requests": 2,
+        "help_seconds": 3.1,
+        "controls_views": 2,
+        "controls_seconds": 6.1
+      },
+      "received_at": "2026-11-23T18:14:35.325Z"
+    }
+  ]
+}

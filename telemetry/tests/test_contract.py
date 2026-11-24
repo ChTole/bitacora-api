@@ -310,6 +310,28 @@ class OrmCompatibilityTests(ContractTestCase):
         self.assertIsNotNone(session.started_at.tzinfo)
 
 
+class AssemblyWorkshopSummaryTests(ContractTestCase):
+    """Al cerrar una sesión del Taller, se guardan su contexto y su resumen."""
+
+    def test_finish_stores_context_and_summary(self):
+        import json
+        from pathlib import Path
+
+        sample = json.loads((Path(__file__).parent / "data" / "sesion_tero_alegre.json").read_text(encoding="utf-8"))
+        events = [{k: e[k] for k in ("sequence", "timestamp", "type", "data")} for e in sample["events"]]
+
+        session_id = self.new_session_id()
+        self.assertEqual(self.send(session_id, events).json()["accepted"], len(events))
+        self.finish(session_id)
+
+        document = store.sessions_collection().find_one({"session_id": session_id})
+        self.assertEqual(document["context"]["furniture_id"], "living_room_table")
+        self.assertEqual(document["summary_version"], 1)
+        self.assertEqual(document["summary"]["source"], "client")
+        self.assertTrue(document["summary"]["correct"])
+        self.assertTrue(document["summary"]["consistent"])
+
+
 class AliasTests(SimpleTestCase):
     class FakeSessions:
         def __init__(self, used):
