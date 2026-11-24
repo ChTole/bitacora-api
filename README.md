@@ -20,7 +20,7 @@ La primera simulación que lo usa es el [Taller de Ensamblado](https://github.co
 - [x] Validación del esquema de las sesiones e índice por mueble.
 - [x] Endpoints de métricas para el tablero (`/stats/v1`), con sus tests.
 - [x] Despliegue en Render y MongoDB Atlas.
-- [ ] Tablero de métricas ([bitacora-tablero](https://github.com/ChTole/bitacora-tablero)).
+- [x] Tablero de métricas ([bitacora-tablero](https://github.com/ChTole/bitacora-tablero)).
 
 ## Stack
 
