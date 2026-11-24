@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta, timezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from rest_framework import serializers
 
@@ -96,4 +97,35 @@ def parse_filters(query_params, allow_group_by=False):
     data = dict(serializer.validated_data)
     data["from_"] = data.pop("from", None)
     return Filters(**data)
+
+
+# ───────────── Parámetros propios de cada endpoint ─────────────
+
+class TimeZoneField(serializers.CharField):
+    default_error_messages = {"invalid_tz": "Debe ser una zona horaria IANA, por ejemplo America/Argentina/Buenos_Aires."}
+
+    def to_internal_value(self, data):
+        value = super().to_internal_value(data)
+        try:
+            ZoneInfo(value)
+        except (ZoneInfoNotFoundError, ValueError):
+            self.fail("invalid_tz")
+        return value
+
+
+class TimelineParams(serializers.Serializer):
+    tz = TimeZoneField(required=False, default="UTC", max_length=64)
+
+
+class SessionListParams(serializers.Serializer):
+    alias = serializers.CharField(required=False, max_length=80)
+    limit = serializers.IntegerField(required=False, default=20, min_value=1, max_value=50)
+    before = BoundField(required=False)
+
+
+def parse_params(serializer_class, query_params):
+    data = query_params.dict() if hasattr(query_params, "dict") else dict(query_params)
+    serializer = serializer_class(data=data)
+    serializer.is_valid(raise_exception=True)
+    return serializer.validated_data
 

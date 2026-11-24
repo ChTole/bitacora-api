@@ -132,3 +132,53 @@ def simulations_overview():
         {"$group": {"_id": "$simulation_id", "sessions": {"$sum": 1}, "last_session_at": {"$max": "$started_at"}}},
     ])
     return {row["_id"]: row for row in rows}
+
+
+def timeline(match, tz):
+    """Sesiones, comprobadas y correctas por día, en la zona horaria tz."""
+    day = {"format": "%Y-%m-%d", "date": "$started_at"}
+    if tz != "UTC":
+        day["timezone"] = tz
+    rows = sessions_collection().aggregate([
+        {"$match": match},
+        {"$group": {
+            "_id": {"$dateToString": day},
+            "sessions": {"$sum": 1},
+            "checked": _count(CHECKED),
+            "correct": _count(CORRECT),
+        }},
+        {"$sort": {"_id": 1}},
+    ])
+    return [{"date": row["_id"], "sessions": row["sessions"], "checked": row["checked"], "correct": row["correct"]}
+            for row in rows]
+
+
+def mortise_failures(match):
+    """Fallas por caja y motivo, a partir de los eventos joint_attempt_failed."""
+    rows = sessions_collection().aggregate([
+        {"$match": match},
+        {"$unwind": "$events"},
+        {"$match": {"events.type": "joint_attempt_failed"}},
+        {"$group": {
+            "_id": {"mortise": "$events.data.mortise", "reason": "$events.data.reason"},
+            "failures": {"$sum": 1},
+            "sessions": {"$addToSet": "$_id"},
+        }},
+    ])
+
+    mortises = {}
+    for row in rows:
+        mortise = row["_id"].get("mortise")
+        if mortise is None:
+            continue
+        entry = mortises.setdefault(mortise, {"mortise": mortise, "failures": 0, "sessions": set(), "by_reason": Counter()})
+        entry["failures"] += row["failures"]
+        entry["sessions"].update(row["sessions"])
+        entry["by_reason"][row["_id"].get("reason") or "unknown"] += row["failures"]
+
+    result = [
+        {**entry, "sessions": len(entry["sessions"]), "by_reason": dict(entry["by_reason"].most_common())}
+        for entry in mortises.values()
+    ]
+    result.sort(key=lambda entry: (-entry["failures"], entry["mortise"]))
+    return result

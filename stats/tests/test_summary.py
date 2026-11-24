@@ -49,7 +49,7 @@ class StatsTestCase(SimpleTestCase):
         Simulation.objects.all().delete()
 
     def add(self, status="completed", furniture="living_room_table", mobile=False, started_at=DAY,
-            last_activity_at=None, **summary_fields):
+            last_activity_at=None, events=None, participant=None, **summary_fields):
         closed = status != "active"
         document = valid_session(
             session_id=str(uuid.uuid4()),
@@ -62,6 +62,9 @@ class StatsTestCase(SimpleTestCase):
             context={"furniture_id": furniture, "app_version": "1.1.1", "mobile": mobile},
             summary=summary(**summary_fields) if closed else None,
             summary_version=1 if closed else None,
+            participant=participant,
+            events=events or [],
+            event_count=len(events or []),
         )
         store.sessions_collection().insert_one(document)
         return document
