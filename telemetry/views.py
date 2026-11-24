@@ -8,6 +8,7 @@ from . import store
 from .authentication import ApiKeyAuthentication, HasSimulationKey
 from .contract import MAX_BATCH_EVENTS
 from .exceptions import BatchTooLarge, InvalidApiKey, InvalidRequest
+from .throttling import ClientIpRateThrottle
 from .serializers import EventBatchSerializer, FinishSerializer, SessionCreateSerializer
 from .utils import to_iso
 
@@ -17,6 +18,8 @@ class ContractView(APIView):
 
     authentication_classes = [ApiKeyAuthentication]
     permission_classes = [HasSimulationKey]
+    throttle_classes = [ClientIpRateThrottle]
+    throttle_scope = "telemetry"
 
     @property
     def simulation_id(self):

@@ -3,7 +3,6 @@ import re
 from bson import ObjectId
 from django.utils.cache import patch_cache_control
 from rest_framework.response import Response
-from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from telemetry import store
@@ -11,6 +10,7 @@ from telemetry.analyzers import get_analyzer
 from telemetry.analyzers.assembly_workshop import AssemblyWorkshopAnalyzer
 from telemetry.exceptions import SessionNotFound
 from telemetry.models import Simulation
+from telemetry.throttling import ClientIpRateThrottle
 from telemetry.utils import to_iso, utc_now
 
 from . import aggregations
@@ -29,7 +29,7 @@ class StatsView(APIView):
 
     authentication_classes = []
     permission_classes = []
-    throttle_classes = [ScopedRateThrottle]
+    throttle_classes = [ClientIpRateThrottle]
     throttle_scope = "stats"
 
     def initial(self, request, *args, **kwargs):

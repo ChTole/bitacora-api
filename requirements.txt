@@ -7,3 +7,8 @@ pymongo>=4.7,<5
 
 djangorestframework>=3.16,<4
 django-cors-headers>=4.7,<5
+
+# Producción: servidor de aplicaciones y archivos estáticos del admin
+gunicorn>=27,<28
+whitenoise>=6.12,<7
+

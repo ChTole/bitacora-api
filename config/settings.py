@@ -42,6 +42,12 @@ DEBUG = env_bool("DJANGO_DEBUG", False)
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS")
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
 
+# Render define el dominio público del servicio (por ejemplo, bitacora-api.onrender.com)
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
+
 if not DEBUG:
     # Render recibe HTTPS y reenvía la solicitud a Django por HTTP, con este encabezado
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -70,6 +76,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # Sirve los archivos estáticos del admin en producción, sin un servidor aparte
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     # CORS va antes de cualquier middleware que pueda generar una respuesta
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -146,6 +154,11 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    # Nombres con hash y archivos comprimidos: el navegador puede guardarlos en caché sin vencimiento
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
 
 
 # ───────────── Django REST Framework ─────────────
@@ -167,6 +180,8 @@ REST_FRAMEWORK = {
     # Límite de solicitudes por IP de la API del tablero (respuesta 429 rate_limited)
     "DEFAULT_THROTTLE_RATES": {
         "stats": env("STATS_RATE_LIMIT", "120/min"),
+        # Más alto: un aula entera puede compartir una misma IP pública
+        "telemetry": env("TELEMETRY_RATE_LIMIT", "600/min"),
     },
 }
 
@@ -176,9 +191,17 @@ REST_FRAMEWORK = {
 # Solo las rutas de la API: el admin no se usa desde otros dominios
 CORS_URLS_REGEX = r"^/(v1|stats)/.*$"
 CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS")
-CORS_ALLOW_HEADERS = ["content-type", "x-api-key"]
-CORS_ALLOW_METHODS = ["GET", "POST", "OPTIONS"]
-
 if DEBUG:
     # En desarrollo, cualquier puerto local (por ejemplo, el servidor de Build and Run de Unity)
     CORS_ALLOWED_ORIGIN_REGEXES = [r"^http://(localhost|127\.0\.0\.1)(:\d+)?$"]
+CORS_ALLOW_HEADERS = ["content-type", "x-api-key"]
+CORS_ALLOW_METHODS = ["GET", "POST", "OPTIONS"]
+
+
+# ───────────── IP del cliente ─────────────
+
+# Encabezado con la IP real de quien hace la solicitud, para el límite de solicitudes.
+# Detrás de un proxy, REMOTE_ADDR es la IP del proxy y todos los clientes compartirían el límite.
+# En Render: HTTP_CF_CONNECTING_IP. Vacío: se usa REMOTE_ADDR (desarrollo).
+CLIENT_IP_HEADER = env("CLIENT_IP_HEADER", "")
+
